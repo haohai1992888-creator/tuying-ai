@@ -19,6 +19,7 @@ permissions:
   contents: write
 
 env:
+  CI: true
   DOWNLOAD_BASE_URL: ${{ secrets.DOWNLOAD_BASE_URL }}
   VITE_UPDATE_JSON_URL: ${{ secrets.VITE_UPDATE_JSON_URL }}
   STORAGE_DRIVER: ${{ secrets.STORAGE_DRIVER }}
@@ -44,16 +45,18 @@ jobs:
         run: npm ci
       - name: Configure publish
         run: node scripts/desktop/configure-publish.mjs
-      - name: Generate icons
-        working-directory: apps/desktop
-        run: npm exec tauri -- icon branding/app-icon.svg
       - name: Sync version
         run: node scripts/desktop/sync-version.mjs ${{ env.VERSION }}
-      - name: Build frontend
-        run: npm run build -w @acs/desktop
-      - name: Build Tauri Windows x64 (NSIS)
-        working-directory: apps/desktop
-        run: npm run tauri:build
+      - name: Generate icons
+        run: node scripts/desktop/generate-icons.mjs
+      - name: Build Windows NSIS
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: apps/desktop
+          release: false
+          args: --bundles nsis
       - name: Collect Windows installer
         shell: pwsh
         run: |
@@ -64,6 +67,7 @@ jobs:
           $Setup = Get-ChildItem -Path $NsisDir -Filter "*.exe" -ErrorAction SilentlyContinue | Select-Object -First 1
           if (-not $Setup) { throw "NSIS installer not found under $NsisDir" }
           Copy-Item $Setup.FullName (Join-Path $OutDir "AI-Commerce-Setup.exe") -Force
+          Write-Host "Collected $($Setup.Name) -> download/windows/AI-Commerce-Setup.exe"
       - name: Collect release metadata
         run: npx tsx scripts/desktop/publish-release.ts --version ${{ env.VERSION }}
       - uses: actions/upload-artifact@v4
@@ -90,22 +94,25 @@ jobs:
         run: npm ci
       - name: Configure publish
         run: node scripts/desktop/configure-publish.mjs
-      - name: Generate icons
-        working-directory: apps/desktop
-        run: npm exec tauri -- icon branding/app-icon.svg
       - name: Sync version
         run: node scripts/desktop/sync-version.mjs ${{ env.VERSION }}
-      - name: Build frontend
-        run: npm run build -w @acs/desktop
-      - name: Build Tauri macOS Universal
-        working-directory: apps/desktop
-        run: npx tauri build --target universal-apple-darwin
+      - name: Generate icons
+        run: node scripts/desktop/generate-icons.mjs
+      - name: Build macOS Universal DMG
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: apps/desktop
+          release: false
+          args: --target universal-apple-darwin --bundles dmg
       - name: Collect macOS DMG
         run: |
           mkdir -p download/mac
           DMG=$(find apps/desktop/src-tauri/target -name '*.dmg' -print -quit)
           if [ -z "$DMG" ]; then echo "DMG not found" >&2; exit 1; fi
           cp "$DMG" download/mac/AI-Commerce.dmg
+          ls -la download/mac/
       - name: Collect release metadata
         run: npx tsx scripts/desktop/publish-release.ts --version ${{ env.VERSION }}
       - uses: actions/upload-artifact@v4
