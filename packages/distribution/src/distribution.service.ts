@@ -1,7 +1,6 @@
 import { createHash } from "node:crypto";
 import { access, mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import path from "node:path";
-import { prisma } from "@acs/database";
 import { getStorageProvider } from "@acs/storage";
 import {
   getDownloadBaseUrl,
@@ -67,6 +66,7 @@ export class DistributionService {
       };
     }
 
+    const { prisma } = await import("@acs/database");
     const version = await prisma.appVersion.findFirst({
       where: { published: true },
       orderBy: { pubDate: "desc" },
