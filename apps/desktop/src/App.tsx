@@ -35,7 +35,7 @@ function Nav() {
   const loggedIn = !!getAccessToken();
   return (
     <nav className="nav">
-      <strong style={{ marginRight: "auto" }}>ACS Desktop</strong>
+      <strong style={{ marginRight: "auto" }}>AI 电商工作台</strong>
       <Link to="/">首页</Link>
       <Link to="/download">下载客户端</Link>
       {loggedIn ? (

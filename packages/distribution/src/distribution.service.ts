@@ -5,6 +5,7 @@ import { getStorageProvider } from "@acs/storage";
 import {
   getDownloadBaseUrl,
   getDownloadRoot,
+  getPublicArtifactUrls,
   MAC_DMG,
   UPDATE_JSON,
   macDir,
@@ -110,7 +111,7 @@ export class DistributionService {
     updateSignatureMac?: string;
   }): Promise<DesktopUpdateJson> {
     const root = getDownloadRoot();
-    const base = getDownloadBaseUrl();
+    const urls = getPublicArtifactUrls(input.version);
     await mkdir(windowsDir(root), { recursive: true });
     await mkdir(macDir(root), { recursive: true });
     await mkdir(updateDir(root), { recursive: true });
@@ -119,24 +120,24 @@ export class DistributionService {
     const macPath = path.join(macDir(root), MAC_DMG);
 
     let winInfo = {
-      url: `${base}/windows/${WIN_INSTALLER}`,
+      url: urls.windows,
       filename: WIN_INSTALLER,
       size: 0,
     };
     let macInfo = {
-      url: `${base}/mac/${MAC_DMG}`,
+      url: urls.mac,
       filename: MAC_DMG,
       size: 0,
     };
 
     try {
-      winInfo = await fileInfo(winPath, `${base}/windows/${WIN_INSTALLER}`, WIN_INSTALLER);
+      winInfo = await fileInfo(winPath, urls.windows, WIN_INSTALLER);
     } catch {
       // artifact not built yet
     }
 
     try {
-      macInfo = await fileInfo(macPath, `${base}/mac/${MAC_DMG}`, MAC_DMG);
+      macInfo = await fileInfo(macPath, urls.mac, MAC_DMG);
     } catch {
       // artifact not built yet
     }

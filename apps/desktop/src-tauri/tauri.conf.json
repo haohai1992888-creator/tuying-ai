@@ -12,7 +12,7 @@
   "app": {
     "windows": [
       {
-        "title": "AI Commerce Studio",
+        "title": "AI 电商工作台",
         "width": 1280,
         "height": 800,
         "resizable": true
@@ -24,7 +24,10 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["nsis", "dmg"],
+    "targets": [
+      "nsis",
+      "dmg"
+    ],
     "createUpdaterArtifacts": false,
     "icon": [
       "icons/32x32.png",
@@ -34,7 +37,18 @@
       "icons/icon.ico"
     ],
     "windows": {
-      "nsis": {}
+      "webviewInstallMode": {
+        "type": "embedBootstrapper"
+      },
+      "nsis": {
+        "languages": [
+          "SimpChinese",
+          "English"
+        ],
+        "displayLanguageSelector": true,
+        "installerIcon": "icons/icon.ico",
+        "installMode": "currentUser"
+      }
     },
     "macOS": {
       "minimumSystemVersion": "10.15",
@@ -45,9 +59,9 @@
     "updater": {
       "active": true,
       "endpoints": [
-        "http://localhost:3001/update.json"
+        "https://github.com/haohai1992888-creator/tuying-ai/releases/download/v1.0.0/update.json"
       ],
-      "dialog": true,
+      "dialog": false,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDAwMDAwMDAwMDAwMDAwMApRUndCQdYQ7XJXQnJ4VXFicGJ6V0Z1YjNOMGNtbHVaejA9Cg=="
     }
   }
