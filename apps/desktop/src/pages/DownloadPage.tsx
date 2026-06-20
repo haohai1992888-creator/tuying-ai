@@ -7,6 +7,10 @@ const API_BASE =
   import.meta.env.VITE_UPDATE_API_BASE ??
   "http://localhost:3001";
 
+const GITHUB_RELEASES_URL =
+  import.meta.env.VITE_GITHUB_RELEASES_URL ??
+  "https://github.com/haohai1992888-creator/tuying-ai/releases";
+
 function formatBytes(size: number): string {
   if (!size || size <= 0) return "—";
   const units = ["B", "KB", "MB", "GB"];
@@ -57,6 +61,14 @@ export default function DownloadPage() {
   }, []);
 
   const version = info?.version ?? "1.0.0";
+  const winReady = (info?.windows.size ?? 0) > 0;
+  const macReady = (info?.mac.size ?? 0) > 0;
+  const winHref = winReady
+    ? (info?.windows.url ?? `${API_BASE}/download/windows/AI-Commerce-Setup.exe`)
+    : GITHUB_RELEASES_URL;
+  const macHref = macReady
+    ? (info?.mac.url ?? `${API_BASE}/download/mac/AI-Commerce.dmg`)
+    : GITHUB_RELEASES_URL;
 
   return (
     <main className="container">
@@ -71,22 +83,32 @@ export default function DownloadPage() {
 
         {error && <p style={{ color: "#dc2626" }}>{error}</p>}
 
+        {!winReady && !macReady && (
+          <p style={{ color: "#b45309", marginTop: 12 }}>
+            本地尚未放置安装包（GitHub Actions 构建完成后可从 Releases 下载，或手动放入 download/windows 与 download/mac）。
+          </p>
+        )}
+
         <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginTop: 20 }}>
           <a
             className={`btn${recommended === "windows" ? "" : " btn-secondary"}`}
-            href={info?.windows.url ?? `${API_BASE}/download/windows/AI-Commerce-Setup.exe`}
-            download
+            href={winHref}
+            download={winReady}
+            target={winReady ? undefined : "_blank"}
+            rel={winReady ? undefined : "noreferrer"}
             style={recommended === "windows" ? { boxShadow: "0 0 0 2px #2563eb" } : undefined}
           >
-            下载 Windows
+            {winReady ? "下载 Windows" : "前往 GitHub 下载 Windows"}
           </a>
           <a
             className={`btn${recommended === "mac" ? "" : " btn-secondary"}`}
-            href={info?.mac.url ?? `${API_BASE}/download/mac/AI-Commerce.dmg`}
-            download
+            href={macHref}
+            download={macReady}
+            target={macReady ? undefined : "_blank"}
+            rel={macReady ? undefined : "noreferrer"}
             style={recommended === "mac" ? { boxShadow: "0 0 0 2px #2563eb" } : undefined}
           >
-            下载 macOS
+            {macReady ? "下载 macOS" : "前往 GitHub 下载 macOS"}
           </a>
         </div>
 
