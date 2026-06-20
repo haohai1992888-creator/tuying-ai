@@ -39,14 +39,7 @@ jobs:
           cache: npm
       - uses: dtolnay/rust-toolchain@stable
       - name: Resolve version
-        shell: bash
-        run: |
-          V="${{ github.event.inputs.version }}"
-          if [ -z "$V" ]; then
-            REF="${{ github.ref_name }}"
-            if [[ "$REF == v* ]]; then V="${REF#v}"; else V="1.0.0"; fi
-          fi
-          echo "VERSION=$V" >> "$GITHUB_ENV"
+        run: node scripts/desktop/resolve-version.mjs "${{ github.event.inputs.version }}"
       - name: Install dependencies
         run: npm ci
       - name: Configure publish
@@ -92,13 +85,7 @@ jobs:
         with:
           targets: aarch64-apple-darwin,x86_64-apple-darwin
       - name: Resolve version
-        run: |
-          V="${{ github.event.inputs.version }}"
-          if [ -z "$V" ]; then
-            REF="${{ github.ref_name }}"
-            if [[ "$REF == v* ]]; then V="${REF#v}"; else V="1.0.0"; fi
-          fi
-          echo "VERSION=$V" >> $GITHUB_ENV
+        run: node scripts/desktop/resolve-version.mjs "${{ github.event.inputs.version }}"
       - name: Install dependencies
         run: npm ci
       - name: Configure publish
@@ -142,20 +129,11 @@ jobs:
           cp artifacts/release-macos/mac/AI-Commerce.dmg release-assets/
           cp artifacts/release-windows/update/update.json release-assets/ 2>/dev/null || true
           ls -la release-assets/
-      - name: Resolve version
-        id: ver
-        run: |
-          V="${{ github.event.inputs.version }}"
-          if [ -z "$V" ]; then
-            REF="${{ github.ref_name }}"
-            if [[ "$REF == v* ]]; then V="${REF#v}"; else V="1.0.0"; fi
-          fi
-          echo "version=$V" >> "$GITHUB_OUTPUT"
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: ${{ github.event_name == 'push' && github.ref_name || format('v{0}', steps.ver.outputs.version) }}
-          name: AI Commerce Desktop v${{ steps.ver.outputs.version }}
+          tag_name: ${{ github.event_name == 'push' && github.ref_name || format('v{0}', github.event.inputs.version) }}
+          name: AI Commerce Desktop ${{ github.event_name == 'push' && github.ref_name || format('v{0}', github.event.inputs.version) }}
           draft: false
           prerelease: false
           generate_release_notes: true
@@ -180,13 +158,7 @@ jobs:
         with:
           path: artifacts
       - name: Resolve version
-        run: |
-          V="${{ github.event.inputs.version }}"
-          if [ -z "$V" ]; then
-            REF="${{ github.ref_name }}"
-            if [[ "$REF == v* ]]; then V="${REF#v}"; else V="1.0.0"; fi
-          fi
-          echo "VERSION=$V" >> $GITHUB_ENV
+        run: node scripts/desktop/resolve-version.mjs "${{ github.event.inputs.version }}"
       - name: Merge download center
         run: |
           mkdir -p download/windows download/mac download/update
