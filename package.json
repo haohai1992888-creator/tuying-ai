@@ -1,0 +1,46 @@
+{
+  "name": "ai-commerce-studio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI Commerce Studio — Monorepo (Turborepo)",
+  "packageManager": "npm@10.9.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "turbo run dev",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "dev:admin": "turbo run dev --filter=@acs/admin",
+    "build:admin": "turbo run build --filter=@acs/admin",
+    "build:desktop": "turbo run build --filter=@acs/desktop",
+    "dev:desktop": "turbo run dev --filter=@acs/desktop",
+    "dev:api": "npm run dev -w @acs/api",
+    "dev:worker": "npm run dev -w @acs/worker",
+    "build:worker": "npm run build -w @acs/worker",
+    "pm2:start": "pm2 start infra/pm2/ecosystem.config.cjs",
+    "pm2:stop": "pm2 stop infra/pm2/ecosystem.config.cjs",
+    "pm2:logs": "pm2 logs",
+    "healthcheck": "node -e \"fetch(process.env.API_URL||'http://localhost:3001/api/health').then(r=>r.json()).then(console.log)\"",
+    "db:generate": "prisma generate --schema=packages/database/prisma/schema.prisma",
+    "db:migrate": "prisma migrate dev --schema=packages/database/prisma/schema.prisma",
+    "db:push": "prisma db push --schema=packages/database/prisma/schema.prisma",
+    "db:seed": "npm run db:seed -w @acs/database",
+    "docker:up": "docker compose -f infra/docker/docker-compose.yml up -d postgres redis",
+    "docker:prod": "docker compose -f infra/docker/docker-compose.yml up -d --build",
+    "docker:rc": "docker compose -f infra/docker/docker-compose.prod.yml --env-file .env.production up -d --build",
+    "docker:down": "docker compose -f infra/docker/docker-compose.yml down",
+    "docker:rc:down": "docker compose -f infra/docker/docker-compose.prod.yml down",
+    "desktop:icons": "node scripts/desktop/generate-icons.mjs",
+    "desktop:configure": "node scripts/desktop/configure-publish.mjs",
+    "build:desktop:win": "powershell -ExecutionPolicy Bypass -File scripts/desktop/build-windows.ps1",
+    "build:desktop:mac": "bash scripts/desktop/build-macos.sh",
+    "release:desktop": "tsx scripts/desktop/publish-release.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.4",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2"
+  }
+}

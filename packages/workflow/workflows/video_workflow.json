@@ -1,0 +1,7 @@
+{
+  "id": "video-workflow",
+  "name": "Product Video Workflow",
+  "description": "商品视频 — 图转视频 + Router + Provider",
+  "version": "1.0.0",
+  "nodes": ["input", "prompt", "router", "generate", "save", "points", "output"]
+}

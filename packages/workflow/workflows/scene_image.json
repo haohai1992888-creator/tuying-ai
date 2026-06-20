@@ -1,0 +1,7 @@
+{
+  "id": "scene-image",
+  "name": "Scene Image Workflow",
+  "description": "场景图生成工作流",
+  "version": "1.0.0",
+  "nodes": ["input", "analysis", "ocr", "prompt", "router", "generate", "save", "points", "output"]
+}

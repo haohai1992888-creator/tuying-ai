@@ -1,0 +1,7 @@
+{
+  "id": "modern",
+  "name": "现代简约",
+  "category": "家居用品",
+  "blocks": ["BANNER", "FEATURE", "SCENE", "PARAMETER", "DETAIL", "BRAND", "REASON"],
+  "style": "modern minimal"
+}

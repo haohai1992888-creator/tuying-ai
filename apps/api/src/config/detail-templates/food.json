@@ -1,0 +1,7 @@
+{
+  "id": "food",
+  "name": "食品摄影",
+  "category": "厨房用品",
+  "blocks": ["BANNER", "FEATURE", "SCENE", "PARAMETER", "REASON"],
+  "style": "food appetizing"
+}

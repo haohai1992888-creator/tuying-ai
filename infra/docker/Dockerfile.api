@@ -1,0 +1,39 @@
+FROM node:22-alpine AS base
+WORKDIR /app
+RUN apk add --no-cache libc6-compat
+
+FROM base AS deps
+COPY package.json package-lock.json* ./
+COPY apps/api/package.json ./apps/api/
+COPY packages/shared/package.json ./packages/shared/
+COPY packages/database/package.json ./packages/database/
+COPY packages/auth/package.json ./packages/auth/
+COPY packages/analytics/package.json ./packages/analytics/
+COPY packages/ops/package.json ./packages/ops/
+COPY packages/queue/package.json ./packages/queue/
+COPY packages/router/package.json ./packages/router/
+COPY packages/payment/package.json ./packages/payment/
+COPY packages/points/package.json ./packages/points/
+COPY packages/storage/package.json ./packages/storage/
+COPY packages/ai-providers/package.json ./packages/ai-providers/
+COPY packages/detail/package.json ./packages/detail/
+COPY packages/update/package.json ./packages/update/
+RUN npm ci --ignore-scripts || npm install
+
+FROM base AS builder
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npm run db:generate
+RUN npm run build -w @acs/api
+
+FROM base AS runner
+ENV NODE_ENV=production
+WORKDIR /app
+COPY --from=builder /app/apps/api/dist ./apps/api/dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/apps/api/package.json ./apps/api/package.json
+EXPOSE 3001
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+  CMD node -e "fetch('http://127.0.0.1:3001/api/health').then(r=>r.json()).then(j=>process.exit(j.success?0:1)).catch(()=>process.exit(1))"
+CMD ["node", "apps/api/dist/index.js"]

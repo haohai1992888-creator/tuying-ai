@@ -1,0 +1,7 @@
+{
+  "id": "poster",
+  "name": "Poster Workflow",
+  "description": "海报生成工作流",
+  "version": "1.0.0",
+  "nodes": ["input", "analysis", "prompt", "router", "generate", "save", "points", "output"]
+}

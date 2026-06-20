@@ -1,0 +1,7 @@
+{
+  "id": "detail-page-workflow",
+  "name": "Detail Page Workflow",
+  "description": "商品详情页 — OCR + 卖点 + 多模块 + 长图拼接",
+  "version": "1.0.0",
+  "nodes": ["input", "ocr", "analysis", "prompt", "router", "generate", "save", "points", "output"]
+}

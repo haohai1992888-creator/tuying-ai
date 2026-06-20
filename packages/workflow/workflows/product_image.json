@@ -1,0 +1,7 @@
+{
+  "id": "product-image",
+  "name": "Product Image Workflow",
+  "description": "商品图/主图优化工作流",
+  "version": "1.0.0",
+  "nodes": ["input", "analysis", "ocr", "prompt", "router", "generate", "save", "points", "output"]
+}

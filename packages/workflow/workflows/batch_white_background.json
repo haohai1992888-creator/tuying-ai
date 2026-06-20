@@ -1,0 +1,7 @@
+{
+  "id": "batch-white-background",
+  "name": "Batch White Background Workflow",
+  "description": "批量白底图工作流",
+  "version": "1.0.0",
+  "nodes": ["input", "analysis", "prompt", "router", "generate", "save", "points", "output"]
+}

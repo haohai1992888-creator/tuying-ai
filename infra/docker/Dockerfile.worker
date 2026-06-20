@@ -1,0 +1,43 @@
+FROM node:22-alpine AS base
+WORKDIR /app
+RUN apk add --no-cache libc6-compat
+
+FROM base AS deps
+COPY package.json package-lock.json* ./
+COPY apps/api/package.json ./apps/api/
+COPY apps/worker/package.json ./apps/worker/
+COPY packages/shared/package.json ./packages/shared/
+COPY packages/database/package.json ./packages/database/
+COPY packages/auth/package.json ./packages/auth/
+COPY packages/analytics/package.json ./packages/analytics/
+COPY packages/ops/package.json ./packages/ops/
+COPY packages/queue/package.json ./packages/queue/
+COPY packages/router/package.json ./packages/router/
+COPY packages/points/package.json ./packages/points/
+COPY packages/payment/package.json ./packages/payment/
+COPY packages/storage/package.json ./packages/storage/
+COPY packages/ai-providers/package.json ./packages/ai-providers/
+COPY packages/detail/package.json ./packages/detail/
+COPY packages/update/package.json ./packages/update/
+RUN npm ci --ignore-scripts || npm install
+
+FROM base AS builder
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
+RUN npm run db:generate
+RUN npm run build -w @acs/api
+RUN npm run build -w @acs/worker
+
+FROM base AS runner
+ENV NODE_ENV=production
+ENV APP_ENV=production
+ENV USE_REDIS_QUEUE=true
+ENV USE_MEMORY_QUEUE=false
+WORKDIR /app
+COPY --from=builder /app/apps/api/dist ./apps/api/dist
+COPY --from=builder /app/apps/worker/dist ./apps/worker/dist
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/package.json ./package.json
+COPY --from=builder /app/apps/api/package.json ./apps/api/package.json
+COPY --from=builder /app/apps/worker/package.json ./apps/worker/package.json
+CMD ["node", "apps/worker/dist/index.js"]

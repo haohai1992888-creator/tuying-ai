@@ -1,0 +1,114 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: acs-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DB:-ai_commerce_studio}
+    ports:
+      - "5432:5432"
+    volumes:
+      - acs_pg_data:/var/lib/postgresql/data
+      - ../../backups:/backups
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: acs-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - acs_redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  api:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.api
+    container_name: acs-api
+    restart: unless-stopped
+    env_file:
+      - ../../.env.production
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/ai_commerce_studio?schema=public
+      REDIS_URL: redis://redis:6379
+      USE_REDIS_QUEUE: "true"
+      USE_MEMORY_QUEUE: "false"
+      API_PORT: "3001"
+      LOG_DIR: /app/logs
+    ports:
+      - "3001:3001"
+    volumes:
+      - ../../logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.worker
+    container_name: acs-worker
+    restart: unless-stopped
+    env_file:
+      - ../../.env.production
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/ai_commerce_studio?schema=public
+      REDIS_URL: redis://redis:6379
+      USE_REDIS_QUEUE: "true"
+      USE_MEMORY_QUEUE: "false"
+      WORKER_CONCURRENCY: "2"
+      LOG_DIR: /app/logs
+    volumes:
+      - ../../logs:/app/logs
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      api:
+        condition: service_started
+
+  admin:
+    build:
+      context: ../..
+      dockerfile: infra/docker/Dockerfile.admin
+    container_name: acs-admin
+    restart: unless-stopped
+    environment:
+      NEXT_PUBLIC_API_BASE: http://api:3001
+    ports:
+      - "3002:3002"
+    depends_on:
+      - api
+
+  nginx:
+    image: nginx:1.27-alpine
+    container_name: acs-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ../nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ../nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - api
+      - admin
+
+volumes:
+  acs_pg_data:
+  acs_redis_data:

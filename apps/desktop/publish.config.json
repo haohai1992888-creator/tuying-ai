@@ -1,0 +1,9 @@
+{
+  "updaterEndpoint": "http://localhost:3001/update.json",
+  "downloadBaseUrl": "http://localhost:3001/download",
+  "artifacts": {
+    "windows": "AI-Commerce-Setup.exe",
+    "mac": "AI-Commerce.dmg",
+    "updateJson": "update.json"
+  }
+}

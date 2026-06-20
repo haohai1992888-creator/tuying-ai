@@ -1,0 +1,7 @@
+{
+  "id": "model-image",
+  "name": "Model Image Workflow",
+  "description": "模特图生成工作流",
+  "version": "1.0.0",
+  "nodes": ["input", "analysis", "prompt", "router", "generate", "save", "points", "output"]
+}

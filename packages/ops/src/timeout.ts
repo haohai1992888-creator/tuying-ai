@@ -1,0 +1,24 @@
+export class TimeoutError extends Error {
+  constructor(ms: number) {
+    super(`Operation timed out after ${ms}ms`);
+    this.name = "TimeoutError";
+  }
+}
+
+export function withTimeout<T>(promise: Promise<T>, ms: number, label = "operation"): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => {
+      reject(new TimeoutError(ms));
+    }, ms);
+
+    promise
+      .then((value) => {
+        clearTimeout(timer);
+        resolve(value);
+      })
+      .catch((error) => {
+        clearTimeout(timer);
+        reject(error instanceof Error ? error : new Error(`${label}: ${String(error)}`));
+      });
+  });
+}

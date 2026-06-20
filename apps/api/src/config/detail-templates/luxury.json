@@ -1,0 +1,7 @@
+{
+  "id": "luxury",
+  "name": "轻奢高端",
+  "category": "美妆",
+  "blocks": ["BANNER", "FEATURE", "SCENE", "BRAND", "REASON"],
+  "style": "luxury premium"
+}

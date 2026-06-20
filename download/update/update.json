@@ -1,0 +1,47 @@
+{
+  "version": "1.0.0",
+  "pub_date": "2026-06-20T13:56:20.332Z",
+  "title": "AI Commerce Desktop v1.0.0",
+  "description": "Windows 64-bit · macOS Universal Binary",
+  "notes": [
+    "1.0.0: Beta 内测客户端首发",
+    "1.0.0: Windows x64 / macOS Universal",
+    "1.0.1: 新增模板市场",
+    "1.1.0: 新增 AI 详情页",
+    "1.1.0: Batch Engine 优化"
+  ],
+  "releaseNotes": [
+    {
+      "version": "1.0.0",
+      "items": [
+        "Beta 内测客户端首发",
+        "Windows x64 / macOS Universal"
+      ]
+    },
+    {
+      "version": "1.0.1",
+      "items": [
+        "新增模板市场"
+      ]
+    },
+    {
+      "version": "1.1.0",
+      "items": [
+        "新增 AI 详情页",
+        "Batch Engine 优化"
+      ]
+    }
+  ],
+  "downloads": {
+    "windows": {
+      "url": "http://localhost:3001/download/windows/AI-Commerce-Setup.exe",
+      "filename": "AI-Commerce-Setup.exe",
+      "size": 0
+    },
+    "mac": {
+      "url": "http://localhost:3001/download/mac/AI-Commerce.dmg",
+      "filename": "AI-Commerce.dmg",
+      "size": 0
+    }
+  }
+}

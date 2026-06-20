@@ -1,0 +1,7 @@
+{
+  "id": "scene-image-workflow",
+  "name": "Scene Image GPT Workflow",
+  "description": "商品场景图 — GPT Image 2",
+  "version": "2.0.0",
+  "nodes": ["input", "prompt", "router", "generate", "save", "points", "output"]
+}

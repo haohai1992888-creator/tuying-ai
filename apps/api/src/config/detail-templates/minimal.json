@@ -1,0 +1,7 @@
+{
+  "id": "minimal",
+  "name": "极简白底",
+  "category": "家居用品",
+  "blocks": ["BANNER", "FEATURE", "DETAIL", "REASON"],
+  "style": "minimal white"
+}

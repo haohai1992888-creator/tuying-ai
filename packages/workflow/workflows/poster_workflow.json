@@ -1,0 +1,7 @@
+{
+  "id": "poster-workflow",
+  "name": "Poster Seedream Workflow",
+  "description": "商品海报 — OCR + 卖点 + Seedream",
+  "version": "2.0.0",
+  "nodes": ["input", "ocr", "analysis", "prompt", "router", "generate", "save", "points", "output"]
+}

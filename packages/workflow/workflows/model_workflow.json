@@ -1,0 +1,7 @@
+{
+  "id": "model-workflow",
+  "name": "Model Image Seedream Workflow",
+  "description": "AI模特图 — 商品图 + 参考图 + Seedream",
+  "version": "2.0.0",
+  "nodes": ["input", "prompt", "router", "generate", "save", "points", "output"]
+}
