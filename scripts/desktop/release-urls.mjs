@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 
 const DEFAULT_REPO = "haohai1992888-creator/tuying-ai";
+/** Baked into desktop release when no VITE_API_BASE secret is set. */
+const DEFAULT_PRODUCTION_API = "https://tuyingai.top";
 
 export function resolveVersion(inputVersion) {
   const refName = process.env.GITHUB_REF_NAME?.trim() || "";
@@ -54,4 +56,27 @@ export function resolveReleaseUrls(version = resolveVersion()) {
     macUrl: `${githubBase}/AI-Commerce.dmg`,
     githubReleasesUrl: `https://github.com/${getGithubRepo()}/releases`,
   };
+}
+
+/** API base URL baked into desktop production build (Vite). */
+export function resolveApiBaseUrl() {
+  const explicit =
+    process.env.VITE_API_BASE?.trim() ||
+    process.env.API_PUBLIC_URL?.trim() ||
+    process.env.API_PUBLIC_BASE?.trim() ||
+    process.env.PUBLIC_API_URL?.trim();
+  if (explicit) return explicit.replace(/\/$/, "");
+
+  const downloadBase =
+    process.env.DOWNLOAD_BASE_URL?.trim()?.replace(/\/$/, "") ||
+    process.env.CDN_PUBLIC_BASE_URL?.trim()?.replace(/\/$/, "");
+  if (downloadBase && !downloadBase.includes("github.com")) {
+    return downloadBase.replace(/\/download$/, "") || downloadBase;
+  }
+
+  if (process.env.CI === "true") {
+    return DEFAULT_PRODUCTION_API;
+  }
+
+  return "http://localhost:3001";
 }

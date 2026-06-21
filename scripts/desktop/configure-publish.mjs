@@ -6,7 +6,7 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { resolveReleaseUrls, resolveVersion } from "./release-urls.mjs";
+import { resolveApiBaseUrl, resolveReleaseUrls, resolveVersion } from "./release-urls.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "../..");
@@ -16,18 +16,21 @@ const viteEnvPath = path.join(root, "apps/desktop/.env.production.local");
 
 const version = resolveVersion();
 const urls = resolveReleaseUrls(version);
+const apiBase = resolveApiBaseUrl();
 
 const conf = JSON.parse(readFileSync(confPath, "utf8"));
 conf.plugins ??= {};
 conf.plugins.updater ??= {};
-conf.plugins.updater.active = true;
-conf.plugins.updater.endpoints = [urls.updateJsonUrl];
-conf.plugins.updater.dialog = false;
+if (conf.plugins.updater.active !== false) {
+  conf.plugins.updater.endpoints = [urls.updateJsonUrl];
+  conf.plugins.updater.dialog = false;
+}
 
 writeFileSync(confPath, `${JSON.stringify(conf, null, 2)}\n`, "utf8");
 
 const publish = {
   version,
+  apiBaseUrl: apiBase,
   updaterEndpoint: urls.updateJsonUrl,
   downloadBaseUrl: urls.downloadBaseUrl,
   artifacts: {
@@ -40,6 +43,7 @@ const publish = {
 writeFileSync(publishPath, `${JSON.stringify(publish, null, 2)}\n`, "utf8");
 
 const viteEnv = [
+  `VITE_API_BASE=${apiBase}`,
   `VITE_UPDATE_JSON_URL=${urls.updateJsonUrl}`,
   `VITE_DOWNLOAD_BASE_URL=${urls.downloadBaseUrl}`,
   `VITE_GITHUB_RELEASES_URL=${urls.githubReleasesUrl}`,
@@ -48,6 +52,14 @@ const viteEnv = [
 writeFileSync(viteEnvPath, `${viteEnv}\n`, "utf8");
 
 console.log(`Release URLs (${urls.mode}) for v${version}:`);
+console.log(`  api     -> ${apiBase}`);
 console.log(`  updater -> ${urls.updateJsonUrl}`);
 console.log(`  windows -> ${urls.winUrl}`);
 console.log(`  mac     -> ${urls.macUrl}`);
+
+if (process.env.CI === "true" && apiBase.startsWith("http://localhost")) {
+  console.warn(
+    "WARN: VITE_API_BASE / API_PUBLIC_URL not set — desktop will still use localhost. " +
+      "Add GitHub Secret VITE_API_BASE=https://tuyingai.top"
+  );
+}
