@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
- * Apply publish-time Tauri updater endpoint + Vite env from CI/release settings.
- * Falls back to GitHub Releases HTTPS URLs (Tauri updater requires https).
+ * Apply publish-time Vite env for desktop builds.
+ * Default: API + download center at http://localhost:3001
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
@@ -46,7 +46,7 @@ const viteEnv = [
   `VITE_API_BASE=${apiBase}`,
   `VITE_UPDATE_JSON_URL=${urls.updateJsonUrl}`,
   `VITE_DOWNLOAD_BASE_URL=${urls.downloadBaseUrl}`,
-  `VITE_GITHUB_RELEASES_URL=${urls.githubReleasesUrl}`,
+  `VITE_DOWNLOAD_PAGE_URL=${urls.downloadBaseUrl}`,
 ].join("\n");
 
 writeFileSync(viteEnvPath, `${viteEnv}\n`, "utf8");
@@ -56,10 +56,3 @@ console.log(`  api     -> ${apiBase}`);
 console.log(`  updater -> ${urls.updateJsonUrl}`);
 console.log(`  windows -> ${urls.winUrl}`);
 console.log(`  mac     -> ${urls.macUrl}`);
-
-if (process.env.CI === "true" && apiBase.startsWith("http://localhost")) {
-  console.warn(
-    "WARN: VITE_API_BASE / API_PUBLIC_URL not set — desktop will still use localhost. " +
-      "Add GitHub Secret VITE_API_BASE=https://tuyingai.top"
-  );
-}

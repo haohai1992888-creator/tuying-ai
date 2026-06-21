@@ -20,15 +20,11 @@ export function getReleaseTag(version?: string): string {
   return `v${normalized}`;
 }
 
-export function getGithubReleaseBase(version?: string): string | null {
+export function getGithubReleaseBase(_version?: string): string | null {
+  // 默认走本地 API 下载中心；仅当显式设置 USE_GITHUB_RELEASES=true 时使用 GitHub Releases
+  if (process.env.USE_GITHUB_RELEASES !== "true") return null;
   const repo = process.env.GITHUB_REPOSITORY?.trim() || DEFAULT_GITHUB_REPO;
-  if (process.env.DOWNLOAD_BASE_URL?.trim() || process.env.CDN_PUBLIC_BASE_URL?.trim()) {
-    return null;
-  }
-  if (!process.env.GITHUB_REPOSITORY && !process.env.CI) {
-    return null;
-  }
-  return `https://github.com/${repo}/releases/download/${getReleaseTag(version)}`;
+  return `https://github.com/${repo}/releases/download/${getReleaseTag(_version)}`;
 }
 
 export function getDownloadBaseUrl(): string {

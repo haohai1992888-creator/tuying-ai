@@ -7,10 +7,6 @@ const API_BASE =
   import.meta.env.VITE_UPDATE_API_BASE ??
   "http://localhost:3001";
 
-const GITHUB_RELEASES_URL =
-  import.meta.env.VITE_GITHUB_RELEASES_URL ??
-  "https://github.com/haohai1992888-creator/tuying-ai/releases";
-
 function formatBytes(size: number): string {
   if (!size || size <= 0) return "—";
   const units = ["B", "KB", "MB", "GB"];
@@ -61,20 +57,20 @@ export default function DownloadPage() {
   }, []);
 
   const version = info?.version ?? "1.0.0";
+  const winHref =
+    info?.windows.url ?? `${API_BASE}/download/windows/AI-Commerce-Setup.exe`;
+  const macHref = info?.mac.url ?? `${API_BASE}/download/mac/AI-Commerce.dmg`;
   const winReady = (info?.windows.size ?? 0) > 0;
   const macReady = (info?.mac.size ?? 0) > 0;
-  const winHref = winReady
-    ? (info?.windows.url ?? `${API_BASE}/download/windows/AI-Commerce-Setup.exe`)
-    : GITHUB_RELEASES_URL;
-  const macHref = macReady
-    ? (info?.mac.url ?? `${API_BASE}/download/mac/AI-Commerce.dmg`)
-    : GITHUB_RELEASES_URL;
 
   return (
     <main className="container">
       <div className="card">
         <h1 style={{ marginTop: 0 }}>下载 AI Commerce 桌面客户端</h1>
         <p>{info?.description ?? "Windows 64-bit · macOS Universal Binary"}</p>
+        <p style={{ color: "#64748b" }}>
+          下载源：<code>{API_BASE}/download</code>
+        </p>
         <p style={{ color: "#64748b" }}>
           当前版本：v{version}
           {" · "}
@@ -85,7 +81,7 @@ export default function DownloadPage() {
 
         {!winReady && !macReady && (
           <p style={{ color: "#b45309", marginTop: 12 }}>
-            本地尚未放置安装包（GitHub Actions 构建完成后可从 Releases 下载，或手动放入 download/windows 与 download/mac）。
+            请先在本地启动 API（npm run dev:api），并将安装包放入 download/windows 与 download/mac。
           </p>
         )}
 
@@ -93,22 +89,18 @@ export default function DownloadPage() {
           <a
             className={`btn${recommended === "windows" ? "" : " btn-secondary"}`}
             href={winHref}
-            download={winReady}
-            target={winReady ? undefined : "_blank"}
-            rel={winReady ? undefined : "noreferrer"}
+            download={winReady ? "AI-Commerce-Setup.exe" : undefined}
             style={recommended === "windows" ? { boxShadow: "0 0 0 2px #2563eb" } : undefined}
           >
-            {winReady ? "下载 Windows" : "前往 GitHub 下载 Windows"}
+            下载 Windows
           </a>
           <a
             className={`btn${recommended === "mac" ? "" : " btn-secondary"}`}
             href={macHref}
-            download={macReady}
-            target={macReady ? undefined : "_blank"}
-            rel={macReady ? undefined : "noreferrer"}
+            download={macReady ? "AI-Commerce.dmg" : undefined}
             style={recommended === "mac" ? { boxShadow: "0 0 0 2px #2563eb" } : undefined}
           >
-            {macReady ? "下载 macOS" : "前往 GitHub 下载 macOS"}
+            下载 macOS
           </a>
         </div>
 

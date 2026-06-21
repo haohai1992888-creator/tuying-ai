@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 const DEFAULT_REPO = "haohai1992888-creator/tuying-ai";
-/** Baked into desktop release when no VITE_API_BASE secret is set. */
-const DEFAULT_PRODUCTION_API = "https://tuyingai.top";
+const DEFAULT_LOCAL_API = "http://localhost:3001";
+const DEFAULT_LOCAL_DOWNLOAD = `${DEFAULT_LOCAL_API}/download`;
 
 export function resolveVersion(inputVersion) {
   const refName = process.env.GITHUB_REF_NAME?.trim() || "";
@@ -46,15 +46,13 @@ export function resolveReleaseUrls(version = resolveVersion()) {
     };
   }
 
-  const githubBase = getGithubReleaseBase(version);
   return {
-    mode: "github",
-    downloadBaseUrl: githubBase,
-    updateJsonUrl:
-      process.env.VITE_UPDATE_JSON_URL?.trim() || `${githubBase}/update.json`,
-    winUrl: `${githubBase}/AI-Commerce-Setup.exe`,
-    macUrl: `${githubBase}/AI-Commerce.dmg`,
-    githubReleasesUrl: `https://github.com/${getGithubRepo()}/releases`,
+    mode: "local",
+    downloadBaseUrl: DEFAULT_LOCAL_DOWNLOAD,
+    updateJsonUrl: `${DEFAULT_LOCAL_API}/update.json`,
+    winUrl: `${DEFAULT_LOCAL_DOWNLOAD}/windows/AI-Commerce-Setup.exe`,
+    macUrl: `${DEFAULT_LOCAL_DOWNLOAD}/mac/AI-Commerce.dmg`,
+    githubReleasesUrl: `${DEFAULT_LOCAL_API}/download`,
   };
 }
 
@@ -75,8 +73,8 @@ export function resolveApiBaseUrl() {
   }
 
   if (process.env.CI === "true") {
-    return DEFAULT_PRODUCTION_API;
+    return DEFAULT_LOCAL_API;
   }
 
-  return "http://localhost:3001";
+  return DEFAULT_LOCAL_API;
 }

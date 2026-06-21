@@ -1,4 +1,6 @@
 {
+  "version": "1.0.3",
+  "apiBaseUrl": "http://localhost:3001",
   "updaterEndpoint": "http://localhost:3001/update.json",
   "downloadBaseUrl": "http://localhost:3001/download",
   "artifacts": {
